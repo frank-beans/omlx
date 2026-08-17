@@ -843,13 +843,14 @@ def _drop_gemma4_mlx_shared_kv_extras_on_load(model_dir: Path):
 
 @contextlib.contextmanager
 def _transpose_qwen35_mlx_vision_patch_embed_on_load(model_dir: Path):
-    """Fix channels-first Qwen3.5 vision weights in MLX checkpoints.
+    """Fix channels-first Qwen3.5-family vision weights in MLX checkpoints.
 
     mlx-vlm skips model sanitizers when safetensors metadata declares
-    ``format=mlx``. Some converted Qwen3.5/3.6 checkpoints retain the PyTorch
-    Conv3d layout ``(out, in, time, height, width)`` for the vision patch
-    embedding, while MLX expects ``(out, time, height, width, in)``. Correct
-    only that unambiguously channels-first tensor during loading.
+    ``format=mlx``. Qwen3.6 and Qwen3.8 use the internal ``qwen3_5`` model
+    type, and some converted checkpoints retain the PyTorch Conv3d layout
+    ``(out, in, time, height, width)`` for the vision patch embedding, while
+    MLX expects ``(out, time, height, width, in)``. Correct only that
+    unambiguously channels-first tensor during loading.
     """
     if _read_config_model_type(model_dir) not in {"qwen3_5", "qwen3_5_moe"}:
         yield
@@ -885,7 +886,7 @@ def _transpose_qwen35_mlx_vision_patch_embed_on_load(model_dir: Path):
         _vu._load_safetensors = original_load_safetensors
         if transposed:
             logger.info(
-                "Transposed Qwen3.5 vision patch embedding to MLX Conv3d "
+                "Transposed Qwen3.5-family vision patch embedding to MLX Conv3d "
                 "layout for %s",
                 model_dir.name,
             )

@@ -1,4 +1,4 @@
-"""Regression tests for Qwen3.5 MLX-format vision patch embeddings."""
+"""Regression tests for Qwen3.5-family MLX vision patch embeddings."""
 
 import json
 from pathlib import Path
